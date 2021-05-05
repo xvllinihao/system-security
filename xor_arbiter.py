@@ -17,7 +17,7 @@ class XOR_arbiter_PUF(object):
         self.y = []
 
     def generate_response(self):
-        # feature_vectors = []
+        feature_vectors = []
         puf_results = []
 
 
@@ -28,18 +28,18 @@ class XOR_arbiter_PUF(object):
             puf = Arbiter_PUF(n_stages=stage, n_crp=1000, challenge_vector=challenge_vector)
             feature_vector, puf_result = puf.generate_response()
 
-            # feature_vectors += feature_vector
+            feature_vectors.append(feature_vector)
             puf_results.append(puf_result)
 
         response = reduce(lambda x, y: x ^ y, puf_results)
 
-        return challenge_vector, response
+        return feature_vectors, response
 
     def generate_dataset(self):
         for i in range(self.n_crp):
-            challenge_vector, puf_result = self.generate_response()
+            feature_vector, puf_result = self.generate_response()
 
-            self.x.append(challenge_vector)
+            self.x.append(feature_vector)
             self.y.append(puf_result)
 
         self.x = np.array(self.x)
@@ -53,7 +53,12 @@ if __name__ == '__main__':
 
     X_train, X_test, Y_train, Y_test = train_test_split(xor_puf.x, xor_puf.y, test_size=0.2, random_state=0)
 
+    nsamples, nx, ny = X_train.shape
+    X_train = X_train.reshape((nsamples, nx*ny))
     clf = LogisticRegression(solver="lbfgs").fit(X_train, Y_train)
+
+    nsamples, nx, ny = X_test.shape
+    X_test = X_test.reshape((nsamples,nx*ny))
     Y_pred = clf.predict(X_test)
     clf_score = clf.score(X_test, Y_test)
     print(clf_score)

@@ -4,7 +4,7 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.svm import SVR
+from sklearn.svm import SVC
 
 
 class Arbiter_PUF(object):
@@ -51,8 +51,8 @@ if __name__ == '__main__':
     clf_score = 0
     clf_crp = 0
 
-    svr_score = 0
-    svr_crp = 0
+    svc_score = 0
+    svc_crp = 0
 
     for n_stage in n_stages:
         n_crp = 100
@@ -70,24 +70,24 @@ if __name__ == '__main__':
                 clf_crp = n_crp
 
 
-            if svr_score < 0.90:
-                svr = SVR(kernel="linear")
-                svr.fit(X_train, Y_train)
-                Y_pred = svr.predict(X_test)
-                svr_score = svr.score(X_test, Y_test)
-                svr_crp = n_crp
+            if svc_score < 0.90:
+                svc = SVC(kernel="linear")
+                svc.fit(X_train, Y_train)
+                Y_pred = svc.predict(X_test)
+                svc_score = svc.score(X_test, Y_test)
+                svc_crp = n_crp
 
             n_crp += 500
             # print(n_crp)
-            flag = ((clf_score < 0.90) or (svr_score < 0.90)) and (n_crp< 5000)
+            flag = ((clf_score < 0.90) or (svc_score < 0.90)) and (n_crp< 5000)
 
 
         print("n_stages:", n_stage)
         print("linear regression accuracy", clf_score)
         print("crps needed", clf_crp)
         print("============================")
-        print("svm regression accuracy", svr_score)
-        print("crps needed", svr_crp)
+        print("svm regression accuracy", svc_score)
+        print("crps needed", svc_crp)
         print("\n")
 
 
