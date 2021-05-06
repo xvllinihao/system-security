@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
@@ -47,7 +44,7 @@ class Arbiter_PUF(object):
         self.y = np.array(self.y)
 
 if __name__ == '__main__':
-    n_stages = [32, 64, 128, 256]
+    n_stages = [32, 64, 128, 256, 512]
     clf_score = 0
     clf_crp = 0
 
@@ -57,6 +54,9 @@ if __name__ == '__main__':
     for n_stage in n_stages:
         n_crp = 100
         flag = True
+        clf_score = 0
+        svc_score = 0
+
 
         while flag:
             arbiter = Arbiter_PUF(n_stages=n_stage, n_crp=n_crp)
@@ -71,13 +71,12 @@ if __name__ == '__main__':
 
 
             if svc_score < 0.90:
-                svc = SVC(kernel="linear")
-                svc.fit(X_train, Y_train)
+                svc = SVC(kernel="linear").fit(X_train, Y_train)
                 Y_pred = svc.predict(X_test)
                 svc_score = svc.score(X_test, Y_test)
                 svc_crp = n_crp
 
-            n_crp += 500
+            n_crp += 100
             # print(n_crp)
             flag = ((clf_score < 0.90) or (svc_score < 0.90)) and (n_crp< 5000)
 
